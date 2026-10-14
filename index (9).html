@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30-Sec Neck Relief Quiz | Ergonomic Spine Assessment</title>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #0b5ed7;
+            --accent-orange: #ff6b00;
+            --accent-orange-hover: #e05d00;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        /* Top Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .main-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e2e8f0;
+            height: 8px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 33%;
+            background: linear-gradient(90deg, #0d6efd, #10b981);
+            transition: width 0.4s ease;
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-step {
+            display: none;
+        }
+
+        .question-step.active {
+            display: block;
+        }
+
+        .step-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f7ff;
+        }
+
+        .option-btn::after {
+            content: "➔";
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .option-btn:hover::after {
+            color: var(--primary-color);
+        }
+
+        /* Analysis Loader Screen */
+        .analysis-loader {
+            text-align: center;
+            padding: 30px 10px;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .analyzing-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Results Screen */
+        .result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .match-badge {
+            background-color: #d1fae5;
+            color: #065f46;
+            font-size: 14px;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .result-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-align: left;
+            background-color: #f8fafc;
+            padding: 15px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .benefits-list {
+            text-align: left;
+            margin-bottom: 25px;
+            list-style: none;
+        }
+
+        .benefits-list li {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-btn {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-orange);
+            color: #ffffff;
+            text-align: center;
+            padding: 18px 20px;
+            font-size: 18px;
+            font-weight: 800;
+            text-decoration: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cta-btn:hover {
+            background-color: var(--accent-orange-hover);
+            transform: translateY(-2px);
+        }
+
+        .sub-guarantee {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        /* Non-Buyer Screen */
+        .rejected-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .rejected-title {
+            font-size: 20px;
+            color: #dc2626;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .rejected-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Footer Guarantee Badges */
+        .footer-trust {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <span class="badge">Clinical Cervical Assessment</span>
+        <h1 class="main-title">Find Out If You Qualify For Ergonomic Spine & Neck Alignment Support</h1>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Quiz Card -->
+    <div class="quiz-card">
+        
+        <!-- Question 1 -->
+        <div class="question-step active" id="step-1">
+            <div class="step-number">Question 1 of 3</div>
+            <div class="question-text">How often do you wake up with neck stiffness, headaches, or shoulder strain?</div>
+            <div class="options-list">
+                <button class="option-btn" onclick="nextQuestion(2, 66)">Every day / Almost every morning</button>
+                <button class="option-btn" onclick="nextQuestion(2, 66)">2–3 times a week</button>
+                <button class="option-btn" onclick="nextQuestion(2, 66)">Rarely / Just checking</button>
+            </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question-step" id="step-2">
+            <div class="step-number">Question 2 of 3</div>
+            <div class="question-text">What is your primary sleeping position during the night?</div>
+            <div class="options-list">
+                <button class="option-btn" onclick="nextQuestion(3, 100)">Side Sleeper</button>
+                <button class="option-btn" onclick="nextQuestion(3, 100)">Back Sleeper</button>
+                <button class="option-btn" onclick="nextQuestion(3, 100)">Stomach Sleeper / Mixed</button>
+            </div>
+        </div>
+
+        <!-- Question 3 (Purchase Intent Filter) -->
+        <div class="question-step" id="step-3">
+            <div class="step-number">Question 3 of 3</div>
+            <div class="question-text">Are you ready to invest in a clinical-grade ergonomic cervical pillow if it comes with a 30-Day Risk-Free Trial & 70% Discount?</div>
+            <div class="options-list">
+                <button class="option-btn" onclick="runAnalysis()">Yes! I want fast relief & 70% Off</button>
+                <button class="option-btn" onclick="showRejection()">No, I am looking for free exercises or home remedies</button>
+            </div>
+        </div>
+
+        <!-- Analysis Loader Screen -->
+        <div class="analysis-loader" id="analysis-loader">
+            <div class="spinner"></div>
+            <div class="analyzing-text">Analyzing Your Sleep Posture & Alignment Profile...</div>
+        </div>
+
+        <!-- Qualified Result Screen (High Buyer) -->
+        <div class="result-screen" id="result-screen">
+            <span class="match-badge">✓ 98% Match Identified</span>
+            <h2 class="result-title">Analysis Complete: Recommended For Ergonomic Cervical Support</h2>
+            
+            <div class="result-desc">
+                Based on your responses, your sleeping posture is causing cervical spine misalignment during sleep. The <strong>Derila Ergonomic Contour Pillow</strong> is strongly recommended for your condition.
+            </div>
+
+            <ul class="benefits-list">
+                <li>✅ <strong>70% Instant Discount Applied</strong></li>
+                <li>✅ <strong>30-Day Money-Back Guarantee Included</strong></li>
+                <li>✅ <strong>Fast USA & Worldwide Express Shipping</strong></li>
+            </ul>
+
+            <!-- YOUR AFFILIATE HOPLINK GOES BELOW -->
+            <a href="YOUR_AFFILIATE_LINK_HERE" class="cta-btn" target="_blank" id="affiliate-btn">
+                CLAIM YOUR 70% OFF & ORDER NOW ➔
+            </a>
+            
+            <div class="sub-guarantee">🔒 Secure 256-Bit Encrypted Checkout • Risk-Free 30-Day Trial</div>
+        </div>
+
+        <!-- Rejection Screen (Non-Buyer Filtered Out) -->
+        <div class="rejected-screen" id="rejected-screen">
+            <h2 class="rejected-title">Assessment Incomplete</h2>
+            <p class="rejected-desc">Thank you for taking the quiz. Based on your selection, our medical-grade contour solution may not be suitable for you at this time if you are strictly seeking free home exercises.</p>
+        </div>
+
+    </div>
+
+    <!-- Trust Badges -->
+    <div class="footer-trust">
+        <span>🛡️ 30-Day Trial</span>
+        <span>🚚 Fast Shipping</span>
+        <span>🔒 Encrypted Checkout</span>
+    </div>
+</div>
+
+<script>
+    function nextQuestion(nextStepNum, progressPercentage) {
+        // Hide all steps
+        document.querySelectorAll('.question-step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        // Show next step
+        document.getElementById('step-' + nextStepNum).classList.add('active');
+        
+        // Update progress bar
+        document.getElementById('progress-bar').style.width = progressPercentage + '%';
+    }
+
+    function runAnalysis() {
+        // Hide Step 3
+        document.getElementById('step-3').classList.remove('active');
+        document.getElementById('progress-container').style.display = 'none';
+        
+        // Show Loader
+        document.getElementById('analysis-loader').style.display = 'block';
+
+        // Wait 1.8 seconds then show results
+        setTimeout(function() {
+            document.getElementById('analysis-loader').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+        }, 1800);
+    }
+
+    function showRejection() {
+        // Hide Step 3
+        document.getElementById('step-3').classList.remove('active');
+        document.getElementById('progress-container').style.display = 'none';
+        
+        // Show Rejection Screen
+        document.getElementById('rejected-screen').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
